@@ -24,7 +24,7 @@ Jira CSV  ──►  mvp.py  ──►  facts.json  ──►  Claude Project  �
                             Claude sees)
 ```
 
-1. **`mvp.py` applies 3 rules** to open issues (Done, Closed and Resolved count as finished):
+1. **`mvp.py` checks the input** (see [Input validation](#input-validation-for-real-jira-data) below), then **applies 3 rules** to open issues. Jira's Status Category decides what is finished when the export has it; otherwise Done, Closed and Resolved count as finished:
 
    | Rule | Flags an issue when |
    |---|---|
@@ -51,19 +51,43 @@ Python is reliable at checking rules but bad at writing. Claude is good at writi
 Requires Python 3.12 or newer.
 
 ```
-pip install pandas
+pip install pandas openpyxl
 python mvp.py data/sample_jira.csv 2026-10-16
 ```
 
-The two inputs are the CSV path and the report date (`YYYY-MM-DD`). A fixed report date gives the same answer every run, so tests can be repeated. If `data/answer_key.csv` exists, the script also prints recall, precision, and any missed or extra issues.
+The two inputs are the path to a Jira export (`.csv` or `.xlsx`) and the report date (`YYYY-MM-DD`). `openpyxl` is only needed for `.xlsx` files. A fixed report date gives the same answer every run, so tests can be repeated. If `data/answer_key.csv` exists, the script also prints recall, precision, and any missed or extra issues.
 
-Expected output ends with:
+Expected output starts with the input checks and ends with the accuracy check:
 
 ```
-Saved facts.json
-
+Input checks: 40 issues read from sample_jira.csv
+  Finished when: Status is Done, Closed, Resolved
+  Treated as open: In Progress, In Review, To Do
+  No warnings
+...
 Caught 10 of 10 planted risks (recall 100%); 0 extra flags (precision 100%)
 ```
+
+## Input validation for real Jira data
+
+A first test on a real Jira export (one issue, `.xlsx`, custom workflow) broke the original pipeline: it crashed on the Excel file, crashed on a column named `Due date` instead of `Due Date`, and flagged a finished issue as Stale because its custom status (`Pending PO Verification`) wasn't in the Done list. The script now checks the input before any rule runs.
+
+| Check | Result |
+|---|---|
+| File exists, is `.csv` or `.xlsx`, and has issue rows | Stop with a clear message |
+| Report date is a real date | Stop |
+| Required columns present (Issue key, Status, Priority, Assignee, Updated, Due Date) | Stop, listing the columns found |
+| Column names matched regardless of capitals and spaces | Auto-fix |
+| Rows without an issue key | Warning, row skipped |
+| Duplicate issue keys | Warning |
+| Dates that can't be read | Warning, with example keys |
+| Issues updated after the report date | Warning (likely a wrong report date) |
+| Done vs open decided by Jira's Status Category when present | Auto-fix |
+| Statuses treated as open | Printed, so the PM can spot a finished status counted as open |
+| CSV encoding (UTF-8, then Windows) | Auto-fix |
+| Answer-key accuracy check | Only runs when the key matches the data |
+
+Tested on 8 inputs: the sample data (still 10 of 10, 0 extra flags), the real export (read directly, 0 risks), a messy CSV (all 4 warnings raised), and five broken inputs that each stopped with a clear message.
 
 ## Test data
 
@@ -83,7 +107,7 @@ Caught 10 of 10 planted risks (recall 100%); 0 extra flags (precision 100%)
 
 ## Limitations
 
-- Synthetic data only, no real company data
+- Risk accuracy measured on synthetic data; real-data testing so far is one single-issue export (not included in the repo)
 - 3 rules: overdue, stale, unassigned high priority
 - Out of scope for the MVP: web app, Claude API, meeting notes
 - Still to do: reports 2 and 3, a test on a fresh unseen dataset, and before/after timing

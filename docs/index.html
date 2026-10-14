@@ -163,6 +163,7 @@ tr:last-child td { border-bottom: none; }
 .pill.red { background: var(--red-soft); color: var(--red); }
 .pill.amber { background: var(--amber-soft); color: var(--amber); }
 .pill.green { background: var(--green-soft); color: var(--green); }
+.pill.info { background: var(--accent-soft); color: var(--accent); }
 
 /* Code */
 pre {
@@ -203,7 +204,7 @@ footer { padding: 48px 0; color: var(--muted); font-size: 0.88rem; }
   <div class="meta">
     <span class="chip">Owner: Deepak Yadav</span>
     <span class="chip">Python · pandas · Claude Project</span>
-    <span class="chip">Synthetic data</span>
+    <span class="chip">Synthetic data + input validation for real exports</span>
     <a class="chip" href="https://github.com/dy671327/ai-status-report">View code on GitHub →</a>
   </div>
 
@@ -222,6 +223,7 @@ footer { padding: 48px 0; color: var(--muted); font-size: 0.88rem; }
     <a href="#prompt">3. Prompt structure</a>
     <a href="#hallucination">4. Stopping invented facts</a>
     <a href="#industry">5. Use in industry</a>
+    <a href="#validation">6. Input validation</a>
   </div>
 </nav>
 
@@ -272,8 +274,14 @@ footer { padding: 48px 0; color: var(--muted); font-size: 0.88rem; }
     <div class="flow" role="img" aria-label="Flow: Jira CSV to mvp.py to facts.json to Claude Project to status report to line-by-line check">
       <div class="step data">
         <div class="tag">Input</div>
-        <div class="title">Jira CSV export</div>
-        <div class="desc">One row per issue: key, status, priority, assignee, updated, due date</div>
+        <div class="title">Jira export</div>
+        <div class="desc">CSV or Excel, one row per issue: key, status, priority, assignee, updated, due date</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step py">
+        <div class="tag">Python checks</div>
+        <div class="title">Input validation</div>
+        <div class="desc">Stops on input it can't trust, warns on smaller problems. <a href="#validation">See checks</a></div>
       </div>
       <div class="arrow">→</div>
       <div class="step py">
@@ -490,7 +498,7 @@ Also flagged: ONB-129, ONB-140, ONB-121, ONB-112, ONB-137</pre>
       </div>
       <div class="card">
         <h3>Adjustable to a team's rules</h3>
-        <p class="muted">The stale limit, which priorities count as high, and which statuses count as done (Done, Closed, Resolved) are settings at the top of the script, changed in one place.</p>
+        <p class="muted">The stale limit, which priorities count as high, and which statuses count as done (Done, Closed, Resolved) are settings at the top of the script, changed in one place. When the export has Jira's Status Category column, custom workflow statuses are handled automatically.</p>
       </div>
       <div class="card">
         <h3>AI output that can be trusted and audited</h3>
@@ -501,11 +509,85 @@ Also flagged: ONB-129, ONB-140, ONB-121, ONB-112, ONB-137</pre>
     <div class="card" style="margin-top:16px">
       <h3>Current limitations</h3>
       <ul>
-        <li>Tested on synthetic data only, no real company data</li>
+        <li>Risk accuracy measured on synthetic data; real-data testing so far is one single-issue export</li>
         <li>3 rules: overdue, stale, unassigned high priority</li>
         <li>Out of scope for the MVP: web app, Claude API, meeting notes</li>
         <li>Still to do: reports 2 and 3, a fresh unseen dataset, and before/after timing</li>
       </ul>
+    </div>
+  </section>
+
+  <!-- 6. Input validation -->
+  <section id="validation">
+    <div class="sec-head"><span class="sec-num">6</span><h2>Input validation for real Jira data</h2></div>
+    <p class="muted">The test data was clean. A real Jira export is not, so before any rule runs, the script checks the input. Problems that would make the risks wrong <strong>stop</strong> the run with a plain-English message; smaller problems are listed as <strong>warnings</strong> so the PM knows what to double-check.</p>
+
+    <div class="card">
+      <h3>Why it was needed: first test on a real export</h3>
+      <p class="muted">A real single-issue Jira export (.xlsx, custom workflow) was run through the original pipeline:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Problem in the real export</th><th>Before</th><th>After validation</th></tr></thead>
+          <tbody>
+            <tr><td>Excel file, not CSV</td><td><span class="pill red">Crash</span> UnicodeDecodeError</td><td><span class="pill green">Handled</span> .xlsx read directly</td></tr>
+            <tr><td>Column named <code>Due date</code>, not <code>Due Date</code></td><td><span class="pill red">Crash</span> KeyError: 'Due Date'</td><td><span class="pill green">Handled</span> names matched regardless of capitals and spaces</td></tr>
+            <tr><td>Custom status <code>Pending PO Verification</code>, which Jira's Status Category marks as Done</td><td><span class="pill red">Wrong</span> treated as open and flagged Stale (50 days)</td><td><span class="pill green">Handled</span> Status Category used to decide done; 0 risks</td></tr>
+            <tr><td>Script compared any file with the sample answer key</td><td><span class="pill red">Misleading</span> "Caught 0 of 10"</td><td><span class="pill green">Handled</span> accuracy check skipped when the key is for different data</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3>The checks</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Check</th><th>Result</th><th>Why it matters</th></tr></thead>
+          <tbody>
+            <tr><td>File exists</td><td><span class="pill red">Stop</span></td><td>Clear message instead of a Python error</td></tr>
+            <tr><td>File type is .csv or .xlsx</td><td><span class="pill red">Stop</span></td><td>Jira exports both; anything else can't be read safely</td></tr>
+            <tr><td>Report date is a real date (YYYY-MM-DD)</td><td><span class="pill red">Stop</span></td><td>Every rule is measured from the report date</td></tr>
+            <tr><td>File has issue rows</td><td><span class="pill red">Stop</span></td><td>An empty report would look like "no risks"</td></tr>
+            <tr><td>Required columns present: Issue key, Status, Priority, Assignee, Updated, Due Date</td><td><span class="pill red">Stop</span></td><td>A missing column would silently switch off a rule. The message lists what was found</td></tr>
+            <tr><td>Column names matched regardless of capitals and spaces</td><td><span class="pill green">Auto-fix</span></td><td>Different Jira setups name columns slightly differently</td></tr>
+            <tr><td>Rows without an issue key</td><td><span class="pill amber">Warn</span> + skipped</td><td>Every risk must point to a real issue key</td></tr>
+            <tr><td>Duplicate issue keys</td><td><span class="pill amber">Warn</span></td><td>The same issue could be counted twice</td></tr>
+            <tr><td>Dates that can't be read</td><td><span class="pill amber">Warn</span> with example keys</td><td>An unreadable due date would silently hide an overdue issue</td></tr>
+            <tr><td>Issues updated after the report date</td><td><span class="pill amber">Warn</span></td><td>Usually means the wrong report date was typed</td></tr>
+            <tr><td>Done vs open decided by Jira's Status Category when present, otherwise Done / Closed / Resolved</td><td><span class="pill green">Auto-fix</span></td><td>Real workflows use custom statuses such as Dev Complete or Ready for QA</td></tr>
+            <tr><td>Statuses treated as open are printed</td><td><span class="pill info">Shown</span></td><td>The PM can see at a glance if a finished status is being counted as open</td></tr>
+            <tr><td>CSV text encoding (UTF-8, then Windows)</td><td><span class="pill green">Auto-fix</span></td><td>CSVs re-saved in older Excel use a different encoding</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:16px">
+      <div class="card">
+        <h3>Tested on 8 inputs</h3>
+        <ul>
+          <li>Sample data, 16 Oct: <strong>still 10 of 10, 0 extra flags</strong>, no warnings</li>
+          <li>Real .xlsx export: read directly, counted as done, 0 risks</li>
+          <li>Real .xlsx without the Excel reader installed: clear install message</li>
+          <li>Messy CSV with renamed columns, a blank key, a duplicate key, an unreadable date and a future update: all 4 warnings raised, custom statuses handled</li>
+          <li>Missing Assignee column, a .txt file, a missing file and the date 2026-13-45: each stopped with a clear message</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Example output: messy CSV</h3>
+<pre>Input checks: 5 issues read from messy.csv
+  Finished when: Status Category is Done
+  Treated as open: Dev Complete, In Progress, Ready for QA
+  WARNING: 1 row(s) without an Issue key were skipped
+  WARNING: Duplicate issue keys: ABC-3
+  WARNING: 1 'Due Date' value(s) could not be read
+           as dates (e.g. ABC-3)
+  WARNING: 1 issue(s) updated after the report date
+           - is the report date right?</pre>
+        <p class="muted" style="margin-top:10px;font-size:0.88rem">Example stop:</p>
+<pre>INPUT ERROR: Missing column(s): Assignee. Columns found:
+Issue key, Status, Priority, Updated, Due Date</pre>
+      </div>
     </div>
   </section>
 
