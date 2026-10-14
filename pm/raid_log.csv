@@ -1,6 +1,0 @@
-ID,Date raised,Type,Description,Impact,Action / mitigation,Status
-R1,2026-10-14,Risk,Claude invents facts in the report,High,"Python decides risks; prompt says ""use only these facts""; check every line",Open
-R2,2026-10-14,Risk,Synthetic data is too clean to be realistic,Medium,"Add messy rows: blank assignees, mixed date formats",Open
-A1,2026-10-14,Assumption,"Overdue, stale and unassigned issues are the most useful first rules",Medium,Revisit after the MVP,Open
-D1,2026-10-14,Decision,"No web app or API in the MVP, to keep cost at zero",,Decided in session 1,Closed
-I1,2026-10-14,Issue,git command not available in terminal (only bundled inside GitHub Desktop),Low,Use GitHub Desktop for commits; optionally install Git for Windows,Open
