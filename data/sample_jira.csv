@@ -1,0 +1,41 @@
+Issue key,Summary,Status,Priority,Assignee,Created,Updated,Due Date,Resolved
+ONB-101,Set up project repository and CI pipeline,Done,High,Rohan Iyer,2026-09-28,2026-10-06,2026-10-07,2026-10-06
+ONB-102,Design sign-up page wireframes,Done,Medium,Sara Khan,2026-09-28,2026-10-07,2026-10-08,2026-10-07
+ONB-103,Create user database schema,Done,High,Arjun Mehta,2026-09-29,2026-10-07,2026-10-09,2026-10-07
+ONB-104,Implement email verification service,Done,High,Arjun Mehta,2026-09-30,2026-10-09,2026-10-09,2026-10-09
+ONB-105,Build sign-up form front end,Done,Medium,Priya Sharma,2026-10-01,2026-10-08,2026-10-09,2026-10-08
+ONB-106,Write API spec for account creation,Done,Medium,Neha Gupta,2026-09-29,2026-10-06,2026-10-08,2026-10-06
+ONB-107,Integrate ID document upload,In Progress,High,Priya Sharma,2026-10-02,2026-10-14,2026-10-13,
+ONB-108,Add password strength checker,Done,Low,Priya Sharma,2026-10-05,2026-10-09,2026-10-12,2026-10-09
+ONB-109,Set up staging environment,Done,High,Rohan Iyer,2026-10-01,2026-10-08,2026-10-08,2026-10-08
+ONB-110,Build welcome email templates,In Progress,Medium,Sara Khan,2026-10-06,2026-10-15,2026-10-21,
+ONB-111,Configure logging and monitoring,Done,Medium,Rohan Iyer,2026-10-05,2026-10-12,2026-10-14,2026-10-12
+ONB-112,Add terms and conditions acceptance step,In Progress,Medium,Neha Gupta,2026-10-02,2026-10-08,2026-10-22,
+ONB-113,Implement login with email and password,Done,Highest,Arjun Mehta,2026-10-01,2026-10-13,2026-10-14,2026-10-13
+ONB-114,Create onboarding progress tracker,In Review,Medium,Priya Sharma,2026-10-06,2026-10-15,2026-10-20,
+ONB-115,Fix session timeout logging users out early,To Do,High,,2026-10-13,2026-10-13,2026-10-19,
+ONB-116,Write unit tests for sign-up API,Done,Medium,Neha Gupta,2026-10-07,2026-10-14,2026-10-15,2026-10-14
+ONB-117,Build company details form,In Progress,Medium,Sara Khan,2026-10-07,2026-10-14,2026-10-23,
+ONB-118,Add address lookup to profile form,In Review,Medium,Sara Khan,2026-10-05,2026-10-15,2026-10-14,
+ONB-119,Set up feature flag service,Done,Low,Rohan Iyer,2026-10-06,2026-10-12,2026-10-13,2026-10-12
+ONB-120,Add tooltips to onboarding steps,To Do,Low,Priya Sharma,2026-10-09,2026-10-12,2026-10-28,
+ONB-121,Translate onboarding screens to Spanish,To Do,Low,Neha Gupta,2026-10-01,2026-10-05,2026-10-27,
+ONB-122,Implement forgot password flow,Done,High,Arjun Mehta,2026-10-05,2026-10-15,2026-10-16,2026-10-15
+ONB-123,Build admin view of new sign-ups,In Progress,Medium,Arjun Mehta,2026-10-08,2026-10-15,2026-10-22,
+ONB-124,Add CAPTCHA to sign-up form,Done,Medium,Priya Sharma,2026-10-06,2026-10-11,2026-10-13,2026-10-11
+ONB-125,Write help centre article for onboarding,To Do,Low,Sara Khan,2026-10-10,2026-10-12,2026-10-30,
+ONB-126,Connect payment details step to billing API,In Progress,Highest,Arjun Mehta,2026-10-03,2026-10-15,2026-10-12,
+ONB-127,Set up automated accessibility checks,Done,Medium,Rohan Iyer,2026-10-07,2026-10-14,2026-10-15,2026-10-14
+ONB-128,Add audit log for account changes,In Review,High,Rohan Iyer,2026-10-08,2026-10-15,2026-10-20,
+ONB-129,Fix duplicate accounts created on double click,To Do,High,,2026-10-14,2026-10-14,2026-10-21,
+ONB-130,Design mobile layout for sign-up flow,Done,Medium,Sara Khan,2026-10-05,2026-10-13,2026-10-14,2026-10-13
+ONB-131,Implement team invite emails,In Progress,High,Neha Gupta,2026-10-07,2026-10-16,2026-10-23,
+ONB-132,Add GDPR data export request,To Do,Medium,Neha Gupta,2026-10-09,2026-10-13,2026-10-29,
+ONB-133,Load test the sign-up API,To Do,Medium,Rohan Iyer,2026-10-05,2026-10-12,2026-10-09,
+ONB-134,Add analytics events to onboarding steps,Done,Low,Priya Sharma,2026-10-08,2026-10-15,2026-10-16,2026-10-15
+ONB-135,Build role selection screen,In Progress,Medium,Priya Sharma,2026-10-09,2026-10-15,2026-10-21,
+ONB-136,Add dark mode support to portal,To Do,Low,Sara Khan,2026-10-12,2026-10-12,2026-10-30,
+ONB-137,Review security of file upload endpoint,In Review,High,Rohan Iyer,2026-10-02,2026-10-09,2026-10-20,
+ONB-138,Implement single sign-on with Google,In Progress,High,Arjun Mehta,2026-10-08,2026-10-14,2026-10-26,
+ONB-139,Add onboarding completion survey,To Do,Low,Neha Gupta,2026-10-12,2026-10-13,2026-10-29,
+ONB-140,Fix error message on failed ID verification,To Do,High,,2026-10-15,2026-10-15,2026-10-22,
