@@ -1,0 +1,63 @@
+{
+  "report_date": "2026-10-16",
+  "total_issues": 40,
+  "done": 17,
+  "open": 23,
+  "risk_counts": {
+    "Overdue": 4,
+    "Stale": 3,
+    "Unassigned high priority": 3
+  },
+  "risks": [
+    {
+      "issue": "ONB-107",
+      "rule": "Overdue",
+      "reason": "Due 2026-10-13, 3 days late, status In Progress"
+    },
+    {
+      "issue": "ONB-118",
+      "rule": "Overdue",
+      "reason": "Due 2026-10-14, 2 days late, status In Review"
+    },
+    {
+      "issue": "ONB-126",
+      "rule": "Overdue",
+      "reason": "Due 2026-10-12, 4 days late, status In Progress"
+    },
+    {
+      "issue": "ONB-133",
+      "rule": "Overdue",
+      "reason": "Due 2026-10-09, 7 days late, status To Do"
+    },
+    {
+      "issue": "ONB-112",
+      "rule": "Stale",
+      "reason": "No update for 8 days (last 2026-10-08)"
+    },
+    {
+      "issue": "ONB-121",
+      "rule": "Stale",
+      "reason": "No update for 11 days (last 2026-10-05)"
+    },
+    {
+      "issue": "ONB-137",
+      "rule": "Stale",
+      "reason": "No update for 7 days (last 2026-10-09)"
+    },
+    {
+      "issue": "ONB-115",
+      "rule": "Unassigned high priority",
+      "reason": "High priority with no assignee"
+    },
+    {
+      "issue": "ONB-129",
+      "rule": "Unassigned high priority",
+      "reason": "High priority with no assignee"
+    },
+    {
+      "issue": "ONB-140",
+      "rule": "Unassigned high priority",
+      "reason": "High priority with no assignee"
+    }
+  ]
+}
