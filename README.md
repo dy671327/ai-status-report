@@ -14,7 +14,8 @@ Weekly status reports take time to write by hand, and risks buried in Jira get m
 |---|---|
 | Risk detection | Caught **10 of 10** planted risks with **0 extra flags** on the original sprint, and **10 of 10 with 0 extra** on a fresh unseen sprint (recall and precision 100% on both) |
 | Report accuracy | **3 reports** checked line by line, **0 invented facts** in the final versions (82 claims checked). Report 1's first draft had 3 invented facts; the prompt was tightened, and reports 2 and 3 were clean on the first draft |
-| Time saved | Not yet measured (manual vs MVP timing planned) |
+| Speed | Risk detection takes **under 1 second** for 40 issues (avg 0.95 s and 0.81 s over 5 runs per dataset; see [`pm/timings.csv`](pm/timings.csv)) |
+| Industry context | 72% of project professionals spend half a day or more each month collating reports ([Wellingtone, State of Project Management 2026](https://pmworldlibrary.net/wp-content/uploads/2026/03/260316-Wellingtone-state-of-PM-2026-press-release.pdf)) |
 
 ## How it works
 
@@ -112,7 +113,7 @@ Tested on 8 inputs: the sample data (still 10 of 10, 0 extra flags), the real ex
 - Risk accuracy measured on two synthetic sprints; real-data testing so far is one single-issue export (not included in the repo)
 - 3 rules: overdue, stale, unassigned high priority
 - Out of scope for the MVP: web app, Claude API, meeting notes
-- Before/after timing of the manual and MVP reports not yet recorded
+- Timing covers the script only; a side-by-side stopwatch comparison of a manual report and the full MVP flow (including review) has not been recorded
 
 ## Project management
 

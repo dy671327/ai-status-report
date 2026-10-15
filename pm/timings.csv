@@ -1,0 +1,3 @@
+Date,Method,Minutes,Notes
+2026-10-15,MVP script (mvp.py) - sample_jira.csv,0.02,"Measured: avg 0.95 s over 5 runs (min 0.79 s, max 1.52 s), 40 issues, report date 2026-10-16. Script only; excludes writing and reviewing the report."
+2026-10-15,MVP script (mvp.py) - test2_jira.csv,0.01,"Measured: avg 0.81 s over 5 runs (min 0.79 s, max 0.82 s), 40 issues, report date 2026-10-16. Script only; excludes writing and reviewing the report."
