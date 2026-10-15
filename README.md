@@ -12,8 +12,8 @@ Weekly status reports take time to write by hand, and risks buried in Jira get m
 
 | Measure | Result |
 |---|---|
-| Risk detection | Caught **10 of 10** planted risks, **0 extra flags** (recall 100%, precision 100%) on the 16 Oct test date |
-| Report accuracy | Report 1 checked line by line: 3 invented facts in the first draft, **0 in the final draft** (22 claims checked). Reports 2 and 3 in progress |
+| Risk detection | Caught **10 of 10** planted risks with **0 extra flags** on the original sprint, and **10 of 10 with 0 extra** on a fresh unseen sprint (recall and precision 100% on both) |
+| Report accuracy | **3 reports** checked line by line, **0 invented facts** in the final versions (82 claims checked). Report 1's first draft had 3 invented facts; the prompt was tightened, and reports 2 and 3 were clean on the first draft |
 | Time saved | Not yet measured (manual vs MVP timing planned) |
 
 ## How it works
@@ -55,7 +55,7 @@ pip install pandas openpyxl
 python mvp.py data/sample_jira.csv 2026-10-16
 ```
 
-The two inputs are the path to a Jira export (`.csv` or `.xlsx`) and the report date (`YYYY-MM-DD`). `openpyxl` is only needed for `.xlsx` files. A fixed report date gives the same answer every run, so tests can be repeated. If `data/answer_key.csv` exists, the script also prints recall, precision, and any missed or extra issues.
+The two inputs are the path to a Jira export (`.csv` or `.xlsx`) and the report date (`YYYY-MM-DD`). `openpyxl` is only needed for `.xlsx` files. A fixed report date gives the same answer every run, so tests can be repeated. If an answer key in `data/` matches the data, the script also prints recall, precision, and any missed or extra issues.
 
 Expected output starts with the input checks and ends with the accuracy check:
 
@@ -91,7 +91,9 @@ Tested on 8 inputs: the sample data (still 10 of 10, 0 extra flags), the real ex
 
 ## Test data
 
-[`data/sample_jira.csv`](data/sample_jira.csv) is a synthetic Jira export: 40 issues (ONB-101 to ONB-140) for one 2-week sprint (5 to 16 Oct 2026) of a 5-person team building a customer onboarding portal. Ten risks were planted on purpose (4 overdue, 3 stale, 3 unassigned high priority) and listed in [`data/answer_key.csv`](data/answer_key.csv), so the script can be scored.
+[`data/sample_jira.csv`](data/sample_jira.csv) is a synthetic Jira export: 40 issues (ONB-101 to ONB-140) for one 2-week sprint (5 to 16 Oct 2026) of a 5-person team building a customer onboarding portal. Ten risks were planted on purpose (4 overdue, 3 stale, 3 unassigned high priority) and listed in [`data/answer_key_1.csv`](data/answer_key_1.csv), so the script can be scored.
+
+[`data/test2_jira.csv`](data/test2_jira.csv) is a fresh dataset for an unseen-data test: 40 different issues (ONB-201 to ONB-240) with the same kinds of risk planted on different issues, listed in [`data/answer_key.csv`](data/answer_key.csv).
 
 ## Repository structure
 
@@ -99,19 +101,19 @@ Tested on 8 inputs: the sample data (still 10 of 10, 0 extra flags), the real ex
 |---|---|
 | [`mvp.py`](mvp.py) | The risk script |
 | [`facts.json`](facts.json) | Output of the latest run |
-| [`data/`](data/) | Synthetic Jira export and answer key |
-| `prompt.md` | Claude Project instructions |
-| `reports/` | Generated reports and the facts each one was based on |
-| [`pm/`](pm/) | Charter and report checks |
+| [`data/`](data/) | Two synthetic Jira exports and their answer keys |
+| [`prompt.md`](prompt.md) | Claude Project instructions |
+| [`reports/`](reports/) | The three reports and the facts each one was based on |
+| [`pm/`](pm/) | Charter and report checks ([`report_checks.csv`](pm/report_checks.csv)) |
 | [`docs/`](docs/) | Project dashboard (GitHub Pages) |
 
 ## Limitations
 
-- Risk accuracy measured on synthetic data; real-data testing so far is one single-issue export (not included in the repo)
+- Risk accuracy measured on two synthetic sprints; real-data testing so far is one single-issue export (not included in the repo)
 - 3 rules: overdue, stale, unassigned high priority
 - Out of scope for the MVP: web app, Claude API, meeting notes
-- Still to do: reports 2 and 3, a test on a fresh unseen dataset, and before/after timing
+- Before/after timing of the manual and MVP reports not yet recorded
 
 ## Project management
 
-The project charter is in [`pm/charter.md`](pm/charter.md). Report checks, timings and lessons learned are kept in `/pm`. Built by Deepak Yadav with help from Claude.
+The project charter is in [`pm/charter.md`](pm/charter.md) and the line-by-line report checks are in [`pm/report_checks.csv`](pm/report_checks.csv). Built by Deepak Yadav with help from Claude.

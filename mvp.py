@@ -3,6 +3,7 @@
 
 import os
 import sys
+import glob
 import json
 import pandas as pd
 
@@ -29,7 +30,7 @@ REQUIRED_COLUMNS = ["Issue key", "Status", "Priority", "Assignee", "Updated", "D
 OPTIONAL_COLUMNS = ["Summary", "Created", "Resolved", "Status Category"]
 DATE_COLUMNS = ["Created", "Updated", "Due Date", "Resolved"]
 FACTS_PATH = "facts.json"
-ANSWER_KEY_PATH = "data/answer_key.csv"
+ANSWER_KEY_PATTERN = "data/answer_key*.csv"   # answer_key.csv, answer_key_1.csv, ...
 
 # ---- 2. Load the file ----
 # Jira can export CSV or Excel (.xlsx). Anything else is stopped with a clear message.
@@ -176,13 +177,19 @@ with open(FACTS_PATH, "w", encoding="utf-8") as f:
     json.dump(facts, f, indent=2)
 print(f"\nSaved {FACTS_PATH}")
 
-# ---- 6. Check against the answer key (only if it exists) ----
+# ---- 6. Check against the answer key (only if one matches) ----
 # Recall = how many planted risks we caught. Precision = how many of our flags were right.
-try:
-    key = pd.read_csv(ANSWER_KEY_PATH)
-    # The key only applies to the dataset it was written for (e.g. not to a real export).
-    if not set(key["Issue key"]) & set(df["Issue key"]):
-        raise FileNotFoundError
+# A key only applies to the dataset it was written for, so use the one whose issue keys match.
+key = None
+for path in sorted(glob.glob(ANSWER_KEY_PATTERN)):
+    candidate = pd.read_csv(path, encoding="utf-8-sig")
+    if set(candidate["Issue key"]) & set(df["Issue key"]):
+        key = candidate
+        break
+
+if key is None:
+    print("\nNo answer key for this data, skipping the accuracy check.")
+else:
     expected = set(zip(key["Issue key"], key["Rule"]))
     found = set(zip(risk_df["issue"], risk_df["rule"]))
     caught = len(expected & found)
@@ -193,5 +200,3 @@ try:
         print("  MISSED:", miss)
     for extra in sorted(found - expected):
         print("  EXTRA: ", extra)
-except FileNotFoundError:
-    print("\nNo answer key for this data, skipping the accuracy check.")

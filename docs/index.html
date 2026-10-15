@@ -199,9 +199,9 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
     </div>
 
     <div class="kpis">
-      <div class="kpi"><div class="num">10 of 10</div><div class="label">Planted risks detected in the test sprint</div></div>
-      <div class="kpi"><div class="num">100%</div><div class="label">Precision: no false flags on the test date</div></div>
-      <div class="kpi"><div class="num">0</div><div class="label">Invented facts in the final reviewed report</div></div>
+      <div class="kpi"><div class="num">20 of 20</div><div class="label">Planted risks detected across two test sprints</div></div>
+      <div class="kpi"><div class="num">100%</div><div class="label">Precision: no false flags on either sprint</div></div>
+      <div class="kpi"><div class="num">3 of 3</div><div class="label">Final reports passed line-by-line review with no invented facts</div></div>
       <div class="kpi"><div class="num">13</div><div class="label">Input checks run before any risk rule</div></div>
     </div>
   </div>
@@ -264,8 +264,17 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
     <div class="cols">
       <div class="panel">
         <h3>Testing the rules</h3>
-        <p>A synthetic Jira export of one two-week sprint (5 to 16 October 2026): 40 issues for a five-person team building a customer onboarding portal. Ten risks were planted on purpose and recorded in an answer key: 4 overdue, 3 stale and 3 unassigned.</p>
-        <p>The script scores itself against the key. On the 16 October report date it found all 10 planted risks and raised no other flags.</p>
+        <p>Synthetic Jira exports of a two-week sprint (5 to 16 October 2026): 40 issues for a five-person team building a customer onboarding portal. Ten risks were planted on purpose and recorded in an answer key: 4 overdue, 3 stale and 3 unassigned.</p>
+        <p>The script scores itself against the matching key. A second, unseen dataset with different issues and risks on different rows tested whether the rules generalise.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Dataset</th><th>Detected</th><th>False flags</th></tr></thead>
+            <tbody>
+              <tr><td>Sprint A (ONB-101 to 140)</td><td class="num">10 of 10</td><td class="num">0</td></tr>
+              <tr><td>Sprint B, unseen (ONB-201 to 240)</td><td class="num">10 of 10</td><td class="num">0</td></tr>
+            </tbody>
+          </table>
+        </div>
         <p class="small muted">The report date is an input, so every run can be repeated exactly.</p>
       </div>
       <div class="panel">
@@ -341,14 +350,16 @@ I will paste a facts.json file produced by a script that checks a Jira export.</
     </div>
 
     <div class="table-panel" style="margin-top:16px">
-      <div class="table-title"><h3>Review log: 16 October report</h3><p>Each draft was checked claim by claim. Instructions were tightened after every finding.</p></div>
+      <div class="table-title"><h3>Review log</h3><p>Every draft was checked claim by claim against its facts file. Instructions were tightened after each finding; reports 2 and 3 used the final instructions.</p></div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Draft</th><th>Claims checked</th><th>Incorrect</th><th>Invented</th><th>Finding and change made</th></tr></thead>
+          <thead><tr><th>Report</th><th>Facts</th><th>Claims checked</th><th>Incorrect</th><th>Invented</th><th>Finding and change made</th></tr></thead>
           <tbody>
-            <tr><td>1</td><td class="num">17</td><td class="num">0</td><td class="num">3</td><td>Invented a project name, a reviewer for ONB-118 and possible causes for stale issues; no RAG section. Added rules banning causes, names and new numbers; fixed headings and top-five order.</td></tr>
-            <tr><td>2</td><td class="num">17</td><td class="num">1</td><td class="num">5</td><td>Most rules ignored. The project instructions were not reaching the model. Instructions and facts were then sent together in one message.</td></tr>
-            <tr><td>3</td><td class="num">22</td><td class="num">0</td><td class="num">0</td><td>All rules followed: RAG Red with the rule stated, top five in the set order, remaining keys listed, follow-ups by role only.</td></tr>
+            <tr><td>1, draft 1</td><td>Sprint A, 16 Oct</td><td class="num">17</td><td class="num">0</td><td class="num">3</td><td>Invented a project name, a reviewer for ONB-118 and possible causes for stale issues; no RAG section. Added rules banning causes, names and new numbers; fixed headings and top-five order.</td></tr>
+            <tr><td>1, draft 2</td><td>Sprint A, 16 Oct</td><td class="num">17</td><td class="num">1</td><td class="num">5</td><td>Most rules ignored. The project instructions were not reaching the model. Instructions and facts were then sent together in one message.</td></tr>
+            <tr><td>1, final</td><td>Sprint A, 16 Oct</td><td class="num">22</td><td class="num">0</td><td class="num">0</td><td>All rules followed: RAG Red with the rule stated, top five in the set order, remaining keys listed, follow-ups by role only.</td></tr>
+            <tr><td>2</td><td>Sprint A, 20 Oct</td><td class="num">34</td><td class="num">0</td><td class="num">0</td><td>18 risks, with one issue under three rules. All 13 risks beyond the top five listed by rule; an unowned overdue issue routed to "needs an owner" instead of an owner follow-up.</td></tr>
+            <tr><td>3</td><td>Sprint B, 16 Oct</td><td class="num">26</td><td class="num">0</td><td class="num">0</td><td>Unseen dataset. All rules followed on first draft.</td></tr>
           </tbody>
         </table>
       </div>
@@ -425,7 +436,7 @@ Also flagged: ONB-129, ONB-140, ONB-121, ONB-112, ONB-137</pre>
           <table>
             <thead><tr><th>Input</th><th>Result</th></tr></thead>
             <tbody>
-              <tr><td>Test sprint, 16 Oct</td><td>10 of 10 risks, no false flags, no warnings</td></tr>
+              <tr><td>Test sprints A and B, 16 Oct</td><td>10 of 10 risks each, no false flags, no warnings</td></tr>
               <tr><td>Real Excel export</td><td>Read directly, correctly counted as finished</td></tr>
               <tr><td>Excel without reader installed</td><td>Install instruction shown</td></tr>
               <tr><td>Messy CSV</td><td>All 4 warnings raised</td></tr>
@@ -479,7 +490,7 @@ Issue key, Status, Priority, Updated, Due Date</pre>
     </div>
 
     <dl class="facts" style="margin-top:32px">
-      <dt>Scope</dt><dd>Three risk rules. Detection accuracy measured on a synthetic sprint; input handling tested on a real Jira export. Real company data is not stored in the repository.</dd>
+      <dt>Scope</dt><dd>Three risk rules. Detection accuracy measured on two synthetic sprints; input handling tested on a real Jira export. Real company data is not stored in the repository.</dd>
       <dt>Stack</dt><dd>Python, pandas, openpyxl, Claude Projects, GitHub.</dd>
     </dl>
   </section>

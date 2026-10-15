@@ -1,0 +1,41 @@
+Issue key,Summary,Status,Priority,Assignee,Created,Updated,Due Date,Resolved
+ONB-201,Set up SMS provider sandbox,Done,Medium,Rohan Iyer,2026-09-29,2026-10-06,2026-10-08,2026-10-06
+ONB-202,Design KYC review screen,Done,High,Sara Khan,2026-09-30,2026-10-07,2026-10-09,2026-10-07
+ONB-203,Add phone number field to sign-up,Done,Medium,Priya Sharma,2026-10-01,2026-10-08,2026-10-09,2026-10-08
+ONB-204,Integrate SMS one-time passcode,In Progress,High,Arjun Mehta,2026-10-02,2026-10-14,2026-10-13,
+ONB-205,Create KYC status table,Done,Medium,Arjun Mehta,2026-09-30,2026-10-07,2026-10-08,2026-10-07
+ONB-206,Write API docs for KYC endpoints,In Progress,Low,Neha Gupta,2026-10-06,2026-10-13,2026-10-23,
+ONB-207,Build document checklist component,Done,Medium,Priya Sharma,2026-10-05,2026-10-09,2026-10-12,2026-10-09
+ONB-208,Add retry for failed uploads,In Review,Medium,Rohan Iyer,2026-10-06,2026-10-15,2026-10-20,
+ONB-209,Map company types to required documents,In Progress,Medium,Neha Gupta,2026-10-01,2026-10-07,2026-10-21,
+ONB-210,Set up error tracking alerts,Done,Low,Rohan Iyer,2026-10-05,2026-10-10,2026-10-13,2026-10-10
+ONB-211,Build KYC review queue for admins,In Progress,High,Arjun Mehta,2026-10-06,2026-10-15,2026-10-22,
+ONB-212,Add country selector to address form,Done,Medium,Sara Khan,2026-10-06,2026-10-12,2026-10-14,2026-10-12
+ONB-213,Fix OTP not resent after timeout,To Do,High,,2026-10-13,2026-10-13,2026-10-20,
+ONB-214,Add consent checkbox for marketing emails,Done,Low,Priya Sharma,2026-10-07,2026-10-13,2026-10-15,2026-10-13
+ONB-215,Show upload progress bar,In Progress,Medium,Priya Sharma,2026-10-08,2026-10-14,2026-10-21,
+ONB-216,Write integration tests for SMS flow,Done,Medium,Neha Gupta,2026-10-07,2026-10-14,2026-10-15,2026-10-14
+ONB-217,Add rejection reasons to KYC review,To Do,Medium,Sara Khan,2026-10-09,2026-10-12,2026-10-27,
+ONB-218,Set up nightly database backups,Done,High,Rohan Iyer,2026-10-05,2026-10-11,2026-10-13,2026-10-11
+ONB-219,Validate tax ID format,In Review,Medium,Sara Khan,2026-10-05,2026-10-15,2026-10-15,
+ONB-220,Add help links to each onboarding step,To Do,Low,Neha Gupta,2026-10-10,2026-10-13,2026-10-29,
+ONB-221,Implement resume onboarding from email link,Done,High,Arjun Mehta,2026-10-05,2026-10-15,2026-10-16,2026-10-15
+ONB-222,Add session expiry warning,In Progress,Medium,Priya Sharma,2026-10-09,2026-10-15,2026-10-22,
+ONB-223,Localise date formats on review screen,To Do,Low,Sara Khan,2026-10-02,2026-10-04,2026-10-28,
+ONB-224,Compress uploaded images,Done,Medium,Rohan Iyer,2026-10-06,2026-10-12,2026-10-13,2026-10-12
+ONB-225,Fix duplicate KYC submissions on refresh,To Do,High,,2026-10-14,2026-10-14,2026-10-22,
+ONB-226,Add audit trail for KYC decisions,In Review,High,Arjun Mehta,2026-10-08,2026-10-15,2026-10-21,
+ONB-227,Design empty state for review queue,Done,Low,Sara Khan,2026-10-07,2026-10-13,2026-10-14,2026-10-13
+ONB-228,Connect bank verification API,In Progress,Highest,Arjun Mehta,2026-10-03,2026-10-13,2026-10-10,
+ONB-229,Write onboarding FAQ content,To Do,Low,Neha Gupta,2026-10-12,2026-10-12,2026-10-30,
+ONB-230,Add rate limiting to OTP endpoint,Done,High,Rohan Iyer,2026-10-08,2026-10-15,2026-10-16,2026-10-15
+ONB-231,Review accessibility of upload screen,In Review,Medium,Priya Sharma,2026-10-03,2026-10-09,2026-10-20,
+ONB-232,Add search to admin review queue,In Progress,Medium,Neha Gupta,2026-10-09,2026-10-16,2026-10-26,
+ONB-233,Send reminder email for incomplete sign-ups,To Do,Medium,Sara Khan,2026-10-11,2026-10-13,2026-10-29,
+ONB-234,Add analytics for drop-off by step,Done,Low,Priya Sharma,2026-10-08,2026-10-14,2026-10-16,2026-10-14
+ONB-235,Build role permissions for reviewers,In Progress,High,Rohan Iyer,2026-10-09,2026-10-14,2026-10-27,
+ONB-236,Migrate legacy user records,To Do,Medium,Neha Gupta,2026-10-05,2026-10-12,2026-10-08,
+ONB-237,Add dark mode to admin screens,To Do,Low,Priya Sharma,2026-10-12,2026-10-12,2026-10-30,
+ONB-238,Fix crash when uploading HEIC photos,To Do,High,,2026-10-15,2026-10-15,2026-10-23,
+ONB-239,Add PDF export of KYC decision,To Do,Medium,Arjun Mehta,2026-10-12,2026-10-14,2026-10-28,
+ONB-240,Load test document upload service,Done,Medium,Rohan Iyer,2026-10-09,2026-10-15,2026-10-16,2026-10-15
