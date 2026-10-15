@@ -4,349 +4,272 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI Status Report Generator</title>
-<meta name="description" content="MVP by Deepak Yadav: Python rules find risks in a Jira CSV export; Claude writes the weekly status report from those facts only.">
+<meta name="description" content="Deepak Yadav. Python rules find risks in a Jira export; Claude writes the weekly status report from those facts only.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #f6f7f9;
-  --surface: #ffffff;
-  --surface-2: #f0f2f5;
-  --text: #1a1d23;
-  --muted: #5b6270;
-  --border: #e1e4ea;
-  --accent: #3b5bdb;
-  --accent-soft: #e8ecfd;
-  --red: #c92a2a;
-  --red-soft: #fdecec;
-  --amber: #b25e09;
-  --amber-soft: #fdf1e3;
-  --green: #2b8a3e;
-  --green-soft: #e7f5ea;
-  --code-bg: #f3f4f7;
-  --shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --bg: #ffffff;
+  --surface: #f8f9fb;
+  --ink: #111827;
+  --ink-2: #374151;
+  --muted: #6b7280;
+  --line: #e5e7eb;
+  --line-strong: #d1d5db;
+  --accent: #1e3a8a;
+  --accent-soft: #eef2fb;
+  --code-bg: #f8f9fb;
+  --stop: #b42318;  --stop-bg: #fef3f2;
+  --warn: #b54708;  --warn-bg: #fffaeb;
+  --ok: #067647;    --ok-bg: #ecfdf3;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0f1115;
-    --surface: #171a21;
-    --surface-2: #1e222b;
-    --text: #e6e8ec;
-    --muted: #9aa1ad;
-    --border: #2a2f3a;
-    --accent: #7c93f5;
-    --accent-soft: #1f2645;
-    --red: #ff8787;
-    --red-soft: #3a1c1f;
-    --amber: #f0a64a;
-    --amber-soft: #3a2a17;
-    --green: #69db7c;
-    --green-soft: #183323;
-    --code-bg: #12151b;
-    --shadow: none;
+    --bg: #0d1117;
+    --surface: #151b23;
+    --ink: #e6edf3;
+    --ink-2: #c9d1d9;
+    --muted: #8b949e;
+    --line: #262c36;
+    --line-strong: #30363d;
+    --accent: #8fb0ff;
+    --accent-soft: #172341;
+    --code-bg: #151b23;
+    --stop: #ff9b90;  --stop-bg: #2d1615;
+    --warn: #f5b76a;  --warn-bg: #2b2112;
+    --ok: #6fd69a;    --ok-bg: #12261b;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0f1115;
-  --surface: #171a21;
-  --surface-2: #1e222b;
-  --text: #e6e8ec;
-  --muted: #9aa1ad;
-  --border: #2a2f3a;
-  --accent: #7c93f5;
-  --accent-soft: #1f2645;
-  --red: #ff8787;
-  --red-soft: #3a1c1f;
-  --amber: #f0a64a;
-  --amber-soft: #3a2a17;
-  --green: #69db7c;
-  --green-soft: #183323;
-  --code-bg: #12151b;
-  --shadow: none;
+  --bg: #0d1117;
+  --surface: #151b23;
+  --ink: #e6edf3;
+  --ink-2: #c9d1d9;
+  --muted: #8b949e;
+  --line: #262c36;
+  --line-strong: #30363d;
+  --accent: #8fb0ff;
+  --accent-soft: #172341;
+  --code-bg: #151b23;
+  --stop: #ff9b90;  --stop-bg: #2d1615;
+  --warn: #f5b76a;  --warn-bg: #2b2112;
+  --ok: #6fd69a;    --ok-bg: #12261b;
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
   margin: 0;
   background: var(--bg);
-  color: var(--text);
-  font: 16px/1.6 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--ink-2);
+  font: 15px/1.65 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
-a { color: var(--accent); }
-code, pre { font-family: "JetBrains Mono", Consolas, monospace; font-size: 0.86em; }
-.wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+h1, h2, h3 { color: var(--ink); }
+code, pre { font-family: "JetBrains Mono", Consolas, monospace; font-size: 0.84em; }
+code { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
+p { margin: 0 0 12px; }
+ul { margin: 0; padding-left: 18px; }
+li { margin-bottom: 6px; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
 
 /* Header */
-header { padding: 48px 0 24px; }
-.eyebrow { color: var(--accent); font-weight: 600; font-size: 0.85rem; letter-spacing: 0.04em; text-transform: uppercase; }
-h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); line-height: 1.2; margin: 8px 0 12px; }
-.lede { color: var(--muted); font-size: 1.1rem; max-width: 720px; margin: 0; }
-.meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
-.chip {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 4px 12px; border-radius: 999px;
-  background: var(--surface); border: 1px solid var(--border);
-  font-size: 0.85rem; color: var(--muted); text-decoration: none;
-}
-a.chip { color: var(--accent); font-weight: 500; }
+header { border-bottom: 1px solid var(--line); padding: 56px 0 40px; }
+.kicker { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-size: clamp(1.9rem, 4vw, 2.5rem); line-height: 1.15; letter-spacing: -0.02em; margin: 10px 0 14px; }
+.lede { font-size: 1.08rem; color: var(--ink-2); max-width: 680px; margin: 0; }
+.byline { display: flex; flex-wrap: wrap; gap: 6px 20px; margin-top: 20px; font-size: 0.9rem; color: var(--muted); }
+.byline strong { color: var(--ink); font-weight: 600; }
+
+/* KPI row */
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); border-radius: 10px; margin-top: 36px; overflow: hidden; }
+.kpi { padding: 20px 22px; border-right: 1px solid var(--line); }
+.kpi:last-child { border-right: none; }
+.kpi .num { font-size: 1.85rem; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; line-height: 1.1; }
+.kpi .label { font-size: 0.85rem; color: var(--muted); margin-top: 6px; line-height: 1.45; }
 
 /* Nav */
-nav {
-  position: sticky; top: 0; z-index: 5;
-  background: color-mix(in srgb, var(--bg) 90%, transparent);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--border);
-}
-nav .wrap { display: flex; gap: 4px; overflow-x: auto; padding-top: 8px; padding-bottom: 8px; }
-nav a {
-  white-space: nowrap; text-decoration: none; color: var(--muted);
-  font-size: 0.9rem; padding: 6px 10px; border-radius: 6px;
-}
-nav a:hover { background: var(--surface-2); color: var(--text); }
-
-/* KPIs */
-.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 28px 0 8px; }
-.kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; box-shadow: var(--shadow); }
-.kpi .num { font-size: 1.9rem; font-weight: 700; line-height: 1.1; }
-.kpi .label { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
-.kpi.pending .num { color: var(--muted); font-size: 1.2rem; padding: 6px 0; }
+nav { position: sticky; top: 0; z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); }
+nav .wrap { display: flex; gap: 24px; overflow-x: auto; }
+nav a { white-space: nowrap; color: var(--muted); font-size: 0.88rem; font-weight: 500; padding: 14px 0; border-bottom: 2px solid transparent; }
+nav a:hover { color: var(--ink); text-decoration: none; border-bottom-color: var(--line-strong); }
 
 /* Sections */
-section { padding: 40px 0 8px; scroll-margin-top: 56px; }
-.sec-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }
-.sec-num {
-  flex: none; width: 32px; height: 32px; border-radius: 8px;
-  background: var(--accent-soft); color: var(--accent);
-  display: grid; place-items: center; font-weight: 700;
-}
-h2 { font-size: 1.5rem; margin: 0; }
-h3 { font-size: 1.05rem; margin: 0 0 8px; }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; box-shadow: var(--shadow); }
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+section { padding: 56px 0 8px; scroll-margin-top: 52px; }
+.sec-label { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+h2 { font-size: 1.45rem; letter-spacing: -0.01em; margin: 0 0 10px; }
+.intro { max-width: 720px; color: var(--ink-2); margin-bottom: 24px; }
+h3 { font-size: 0.98rem; margin: 0 0 8px; }
+.panel { border: 1px solid var(--line); border-radius: 10px; padding: 22px; background: var(--bg); }
+.panel + .panel, .cols + .panel, .panel + .cols, .cols + .cols { margin-top: 16px; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.cols > *, .controls > *, .pipeline > * { min-width: 0; margin-top: 0 !important; }
 .muted { color: var(--muted); }
-p { margin: 0 0 12px; }
-ul { margin: 0; padding-left: 20px; }
-li { margin-bottom: 6px; }
+.small { font-size: 0.86rem; }
 
-/* Flow diagram */
-.flow { display: flex; align-items: stretch; gap: 0; overflow-x: auto; padding: 4px 0 8px; }
-.step {
-  flex: 1 1 0; min-width: 140px;
-  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-  padding: 14px; box-shadow: var(--shadow);
+/* Definition list style for problem/scope */
+.facts { display: grid; grid-template-columns: 180px 1fr; border-top: 1px solid var(--line); }
+.facts dt, .facts dd { margin: 0; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.facts dt { font-weight: 600; color: var(--ink); font-size: 0.9rem; }
+
+/* Pipeline diagram */
+.pipeline { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.stage { padding: 18px 16px; border-right: 1px solid var(--line); position: relative; background: var(--bg); }
+.stage:last-child { border-right: none; }
+.stage .who { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.stage.python .who { color: var(--accent); }
+.stage .name { font-weight: 600; color: var(--ink); margin: 6px 0 6px; font-size: 0.95rem; }
+.stage .what { font-size: 0.83rem; color: var(--muted); line-height: 1.5; }
+.stage .step { position: absolute; top: 16px; right: 14px; font-size: 0.75rem; color: var(--line-strong); font-weight: 600; }
+.stage:not(:last-child)::after {
+  content: ""; position: absolute; right: -6px; top: 50%; width: 10px; height: 10px;
+  background: var(--bg); border-top: 1px solid var(--line); border-right: 1px solid var(--line);
+  transform: translateY(-50%) rotate(45deg); z-index: 1;
 }
-.step .tag { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
-.step .title { font-weight: 600; margin: 4px 0 4px; }
-.step .desc { font-size: 0.85rem; color: var(--muted); line-height: 1.45; }
-.step.py { border-top: 3px solid var(--accent); }
-.step.py .tag { color: var(--accent); }
-.step.ai { border-top: 3px solid var(--amber); }
-.step.ai .tag { color: var(--amber); }
-.step.pm { border-top: 3px solid var(--green); }
-.step.pm .tag { color: var(--green); }
-.step.data { border-top: 3px solid var(--muted); }
-.step.data .tag { color: var(--muted); }
-.arrow { flex: none; display: grid; place-items: center; width: 28px; color: var(--muted); font-size: 1.2rem; }
-.split { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
-.split .card { border-left: 4px solid var(--accent); }
-.split .card.ai { border-left-color: var(--amber); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 20px; margin-top: 12px; font-size: 0.83rem; color: var(--muted); }
+.legend span::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 6px; vertical-align: 1px; background: var(--muted); }
+.legend span.py::before { background: var(--accent); }
 
 /* Tables */
 .table-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
-th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
-th { color: var(--muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; }
+table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); background: var(--surface); }
 tr:last-child td { border-bottom: none; }
-.pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; }
-.pill.red { background: var(--red-soft); color: var(--red); }
-.pill.amber { background: var(--amber-soft); color: var(--amber); }
-.pill.green { background: var(--green-soft); color: var(--green); }
-.pill.info { background: var(--accent-soft); color: var(--accent); }
+td.num { font-variant-numeric: tabular-nums; }
+.table-panel { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.table-panel + .table-panel, .table-panel + .cols, .cols + .table-panel, .panel + .table-panel, .table-panel + .panel { margin-top: 16px; }
+.table-title { padding: 16px 14px 12px; border-bottom: 1px solid var(--line); }
+.table-title h3 { margin: 0; }
+.table-title p { margin: 4px 0 0; font-size: 0.86rem; color: var(--muted); }
+
+/* Status tags: reserved for validation outcomes, always with a text label */
+.tag { display: inline-block; font-size: 0.75rem; font-weight: 600; padding: 2px 8px; border-radius: 4px; white-space: nowrap; border: 1px solid transparent; }
+.tag.stop { color: var(--stop); background: var(--stop-bg); }
+.tag.warn { color: var(--warn); background: var(--warn-bg); }
+.tag.ok { color: var(--ok); background: var(--ok-bg); }
+.tag.plain { color: var(--ink-2); background: var(--surface); border-color: var(--line); }
 
 /* Code */
-pre {
-  background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px;
-  padding: 16px; overflow-x: auto; margin: 0; line-height: 1.55; white-space: pre-wrap; word-break: break-word;
-}
-.prompt-part { display: grid; grid-template-columns: 180px 1fr; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--border); }
-.prompt-part:last-child { border-bottom: none; }
-.prompt-part .why { font-size: 0.88rem; color: var(--muted); margin-top: 6px; }
+pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; overflow-x: auto; margin: 0; line-height: 1.6; white-space: pre-wrap; word-break: break-word; color: var(--ink-2); }
 
-/* Timeline of attempts */
-.attempts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-.attempt .big { font-size: 1.6rem; font-weight: 700; }
-.callout {
-  background: var(--accent-soft); border-radius: 12px; padding: 16px 20px; margin-top: 16px;
-}
-.callout strong { color: var(--accent); }
+/* Prompt anatomy */
+.prompt-row { display: grid; grid-template-columns: 200px 1fr; gap: 20px; padding: 20px 0; border-bottom: 1px solid var(--line); }
+.prompt-row:first-child { padding-top: 0; }
+.prompt-row:last-child { border-bottom: none; padding-bottom: 0; }
+.prompt-row .purpose { font-size: 0.86rem; color: var(--muted); margin-top: 4px; }
 
-footer { padding: 48px 0; color: var(--muted); font-size: 0.88rem; }
+/* Controls list */
+.controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.controls .panel h3 { display: flex; gap: 10px; align-items: baseline; }
+.controls .idx { color: var(--accent); font-variant-numeric: tabular-nums; }
 
-@media (max-width: 860px) {
-  .kpis { grid-template-columns: repeat(2, 1fr); }
-  .grid-3, .attempts { grid-template-columns: 1fr; }
-  .grid-2, .split { grid-template-columns: 1fr; }
-  .flow { flex-direction: column; }
-  .step { min-width: 0; }
-  .arrow { width: auto; height: 24px; transform: rotate(90deg); }
-  .prompt-part { grid-template-columns: 1fr; gap: 6px; }
+footer { margin-top: 64px; border-top: 1px solid var(--line); padding: 28px 0 40px; font-size: 0.86rem; color: var(--muted); }
+footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+
+@media (max-width: 900px) {
+  .kpis { grid-template-columns: 1fr 1fr; }
+  .kpi:nth-child(2) { border-right: none; }
+  .kpi:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+  .pipeline { grid-template-columns: 1fr; }
+  .stage { border-right: none; border-bottom: 1px solid var(--line); }
+  .stage:last-child { border-bottom: none; }
+  .stage:not(:last-child)::after { right: auto; left: 24px; top: auto; bottom: -6px; transform: rotate(135deg); border-top: 1px solid var(--line); border-right: 1px solid var(--line); }
+  .cols, .controls { grid-template-columns: 1fr; }
+  .table-panel table { min-width: 620px; }
+  .prompt-row { grid-template-columns: 1fr; gap: 8px; }
+  .facts { grid-template-columns: 1fr; }
+  .facts dt { border-bottom: none; padding-bottom: 0; }
 }
 </style>
 </head>
 <body>
 
-<header class="wrap">
-  <div class="eyebrow">MVP · Project management + AI</div>
-  <h1>AI Status Report Generator</h1>
-  <p class="lede">Turns a Jira CSV export into a weekly status report. Python rules find the risks; Claude writes the report from those facts only.</p>
-  <div class="meta">
-    <span class="chip">Owner: Deepak Yadav</span>
-    <span class="chip">Python · pandas · Claude Project</span>
-    <span class="chip">Synthetic data + input validation for real exports</span>
-    <a class="chip" href="https://github.com/dy671327/ai-status-report">View code on GitHub →</a>
-  </div>
+<header>
+  <div class="wrap">
+    <div class="kicker">Project management · Applied AI</div>
+    <h1>AI Status Report Generator</h1>
+    <p class="lede">A Python script finds delivery risks in a Jira export. Claude writes the weekly status report from those findings and nothing else.</p>
+    <div class="byline">
+      <span><strong>Deepak Yadav</strong></span>
+      <span>Python, pandas, Claude Projects</span>
+      <a href="https://github.com/dy671327/ai-status-report">Source on GitHub</a>
+    </div>
 
-  <div class="kpis">
-    <div class="kpi"><div class="num">10 / 10</div><div class="label">Planted risks caught by the script (recall 100%)</div></div>
-    <div class="kpi"><div class="num">0</div><div class="label">Extra flags on the test date (precision 100%)</div></div>
-    <div class="kpi"><div class="num">3 → 0</div><div class="label">Invented facts in report 1: first draft vs final checked draft</div></div>
-    <div class="kpi pending"><div class="num">In progress</div><div class="label">Time saved: manual vs MVP timing not yet measured</div></div>
+    <div class="kpis">
+      <div class="kpi"><div class="num">10 of 10</div><div class="label">Planted risks detected in the test sprint</div></div>
+      <div class="kpi"><div class="num">100%</div><div class="label">Precision: no false flags on the test date</div></div>
+      <div class="kpi"><div class="num">0</div><div class="label">Invented facts in the final reviewed report</div></div>
+      <div class="kpi"><div class="num">13</div><div class="label">Input checks run before any risk rule</div></div>
+    </div>
   </div>
 </header>
 
 <nav>
   <div class="wrap">
-    <a href="#problem">1. Problem</a>
-    <a href="#solution">2. How it works</a>
-    <a href="#prompt">3. Prompt structure</a>
-    <a href="#hallucination">4. Stopping invented facts</a>
-    <a href="#industry">5. Use in industry</a>
-    <a href="#validation">6. Input validation</a>
+    <a href="#problem">Problem</a>
+    <a href="#approach">Approach</a>
+    <a href="#prompt">Prompt design</a>
+    <a href="#accuracy">Report accuracy</a>
+    <a href="#validation">Input validation</a>
+    <a href="#use">Use in practice</a>
   </div>
 </nav>
 
 <main class="wrap">
 
-  <!-- 1. Problem -->
   <section id="problem">
-    <div class="sec-head"><span class="sec-num">1</span><h2>The problem</h2></div>
-    <div class="grid-2">
-      <div class="card">
-        <h3>Status reports are slow to write by hand</h3>
-        <p class="muted">Every week a project manager reads through the Jira board and writes a status report manually: summary, RAG status, top risks and decisions needed.</p>
-      </div>
-      <div class="card">
-        <h3>Risks buried in Jira get missed</h3>
-        <p class="muted">An overdue ticket, an issue nobody has touched for a week, or a high-priority item with no owner can sit unnoticed among dozens of rows.</p>
-      </div>
-    </div>
-    <div class="card" style="margin-top:16px">
-      <h3>Goal from the project charter</h3>
-      <p>A script that flags risks from a Jira CSV, plus a Claude prompt that writes the report.</p>
-      <div class="grid-2" style="margin-top:12px">
-        <div>
-          <div class="muted" style="font-size:0.85rem;font-weight:600;margin-bottom:6px">IN SCOPE</div>
-          <ul>
-            <li>3 risk rules: overdue, stale, unassigned high priority</li>
-            <li>Synthetic test data</li>
-            <li>Claude Project prompt</li>
-            <li>Timing test</li>
-          </ul>
-        </div>
-        <div>
-          <div class="muted" style="font-size:0.85rem;font-weight:600;margin-bottom:6px">SUCCESS CRITERIA</div>
-          <ul>
-            <li>Catches 10 of 10 planted risks</li>
-            <li>Zero invented facts in 3 reports</li>
-            <li>Time measured before and after</li>
-          </ul>
-        </div>
-      </div>
-    </div>
+    <div class="sec-label">Problem</div>
+    <h2>Weekly status reports are manual, and risks get missed</h2>
+    <p class="intro">A project manager writes a status report every week by reading the Jira board: a summary, a RAG status, the top risks and the decisions needed. Overdue tickets, issues that have gone quiet and high-priority work with no owner are easy to overlook in a list of dozens of rows.</p>
+    <dl class="facts">
+      <dt>Goal</dt><dd>A script that flags risks from a Jira export, plus a Claude prompt that writes the report.</dd>
+      <dt>Risk rules</dt><dd>Overdue, stale (no update for 7+ days), unassigned high priority.</dd>
+      <dt>Report format</dt><dd>Summary, RAG status, progress, top risks with issue keys, decisions needed.</dd>
+      <dt>Out of scope</dt><dd>Web app, Claude API, meeting notes.</dd>
+    </dl>
   </section>
 
-  <!-- 2. Solution -->
-  <section id="solution">
-    <div class="sec-head"><span class="sec-num">2</span><h2>How it solves it</h2></div>
+  <section id="approach">
+    <div class="sec-label">Approach</div>
+    <h2>Rules decide the facts. The model only writes.</h2>
+    <p class="intro">Python applies exact rules, so the same input always gives the same risks. Claude is good at writing but can invent details, so it never decides what is a risk. It receives a small facts file and turns it into a readable report.</p>
 
-    <div class="flow" role="img" aria-label="Flow: Jira CSV to mvp.py to facts.json to Claude Project to status report to line-by-line check">
-      <div class="step data">
-        <div class="tag">Input</div>
-        <div class="title">Jira export</div>
-        <div class="desc">CSV or Excel, one row per issue: key, status, priority, assignee, updated, due date</div>
-      </div>
-      <div class="arrow">→</div>
-      <div class="step py">
-        <div class="tag">Python checks</div>
-        <div class="title">Input validation</div>
-        <div class="desc">Stops on input it can't trust, warns on smaller problems. <a href="#validation">See checks</a></div>
-      </div>
-      <div class="arrow">→</div>
-      <div class="step py">
-        <div class="tag">Python decides</div>
-        <div class="title">mvp.py</div>
-        <div class="desc">Applies 3 exact rules to open issues and writes a one-line reason for each risk</div>
-      </div>
-      <div class="arrow">→</div>
-      <div class="step data">
-        <div class="tag">Handoff</div>
-        <div class="title">facts.json</div>
-        <div class="desc">Report date, counts and the risk list. The only thing Claude sees</div>
-      </div>
-      <div class="arrow">→</div>
-      <div class="step ai">
-        <div class="tag">AI writes</div>
-        <div class="title">Claude Project</div>
-        <div class="desc">Fixed instructions turn the facts into a report in the same format every week</div>
-      </div>
-      <div class="arrow">→</div>
-      <div class="step pm">
-        <div class="tag">Human checks</div>
-        <div class="title">Line-by-line review</div>
-        <div class="desc">Every key, number and reason compared with facts.json before it counts as done</div>
-      </div>
+    <div class="pipeline" role="img" aria-label="Pipeline: Jira export, input validation, risk rules, facts.json, Claude Project, human review">
+      <div class="stage"><span class="step">1</span><div class="who">Input</div><div class="name">Jira export</div><div class="what">CSV or Excel, one row per issue</div></div>
+      <div class="stage python"><span class="step">2</span><div class="who">Python</div><div class="name">Input validation</div><div class="what">Stops on input it cannot trust; warns on smaller problems</div></div>
+      <div class="stage python"><span class="step">3</span><div class="who">Python</div><div class="name">Risk rules</div><div class="what">Three rules on open issues, each with a one-line reason</div></div>
+      <div class="stage python"><span class="step">4</span><div class="who">Python</div><div class="name">facts.json</div><div class="what">Report date, counts and risk list. The only input Claude sees</div></div>
+      <div class="stage"><span class="step">5</span><div class="who">Claude</div><div class="name">Claude Project</div><div class="what">Fixed instructions produce the same five-section report each week</div></div>
+      <div class="stage"><span class="step">6</span><div class="who">Project manager</div><div class="name">Line-by-line review</div><div class="what">Every issue key, number and reason checked against facts.json</div></div>
     </div>
+    <div class="legend"><span class="py">Deterministic (Python)</span><span>Model or human</span></div>
 
-    <div class="split">
-      <div class="card">
-        <h3>Why Python finds the risks</h3>
-        <p class="muted">Python is reliable at checking rules: same input, same answer, every time. Each rule is one line of logic that can be explained and tested.</p>
-      </div>
-      <div class="card ai">
-        <h3>Why Claude only writes</h3>
-        <p class="muted">Claude is good at writing but can invent things. So it never decides what the risks are. It only explains the facts it is given, in clear English.</p>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:16px">
-      <h3>The three risk rules</h3>
-      <p class="muted">Applied only to open issues. Done, Closed and Resolved count as finished.</p>
+    <div class="table-panel" style="margin-top:24px">
+      <div class="table-title"><h3>Risk rules</h3><p>Applied to open issues only. Jira's Status Category decides what is finished; without it, Done, Closed and Resolved count as finished.</p></div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Rule</th><th>Flags an issue when…</th><th>Example reason written by the script</th></tr></thead>
+          <thead><tr><th>Rule</th><th>Condition</th><th>Reason written to facts.json</th></tr></thead>
           <tbody>
-            <tr><td><span class="pill red">Overdue</span></td><td>Due date is before the report date</td><td><code>Due 2026-10-09, 7 days late, status To Do</code></td></tr>
-            <tr><td><span class="pill amber">Stale</span></td><td>Last update was 7 or more days before the report date</td><td><code>No update for 11 days (last 2026-10-05)</code></td></tr>
-            <tr><td><span class="pill amber">Unassigned high priority</span></td><td>Priority is High or Highest and Assignee is blank</td><td><code>High priority with no assignee</code></td></tr>
+            <tr><td>Overdue</td><td>Due date is before the report date</td><td><code>Due 2026-10-09, 7 days late, status To Do</code></td></tr>
+            <tr><td>Stale</td><td>Last update 7 or more days before the report date</td><td><code>No update for 11 days (last 2026-10-05)</code></td></tr>
+            <tr><td>Unassigned high priority</td><td>Priority High or Highest, assignee blank</td><td><code>High priority with no assignee</code></td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <div class="grid-2" style="margin-top:16px">
-      <div class="card">
-        <h3>How the script was tested</h3>
-        <ul>
-          <li>Synthetic Jira export: 40 issues, one 2-week sprint (5–16 Oct 2026), 5-person team building a customer onboarding portal</li>
-          <li>10 risks planted on purpose (4 overdue, 3 stale, 3 unassigned), listed in an answer key</li>
-          <li>The script compares its findings with the answer key and prints recall and precision</li>
-          <li>Result on the 16 Oct report date: <strong>caught 10 of 10, 0 extra flags</strong></li>
-        </ul>
+    <div class="cols">
+      <div class="panel">
+        <h3>Testing the rules</h3>
+        <p>A synthetic Jira export of one two-week sprint (5 to 16 October 2026): 40 issues for a five-person team building a customer onboarding portal. Ten risks were planted on purpose and recorded in an answer key: 4 overdue, 3 stale and 3 unassigned.</p>
+        <p>The script scores itself against the key. On the 16 October report date it found all 10 planted risks and raised no other flags.</p>
+        <p class="small muted">The report date is an input, so every run can be repeated exactly.</p>
       </div>
-      <div class="card">
-        <h3>Example: facts.json (16 Oct)</h3>
+      <div class="panel">
+        <h3>facts.json for 16 October</h3>
 <pre>{
   "report_date": "2026-10-16",
   "total_issues": 40,
@@ -358,7 +281,8 @@ footer { padding: 48px 0; color: var(--muted); font-size: 0.88rem; }
     "Unassigned high priority": 3
   },
   "risks": [
-    { "issue": "ONB-107", "rule": "Overdue",
+    { "issue": "ONB-107",
+      "rule": "Overdue",
       "reason": "Due 2026-10-13, 3 days late, status In Progress" },
     ...
   ]
@@ -367,104 +291,71 @@ footer { padding: 48px 0; color: var(--muted); font-size: 0.88rem; }
     </div>
   </section>
 
-  <!-- 3. Prompt -->
   <section id="prompt">
-    <div class="sec-head"><span class="sec-num">3</span><h2>Prompt structure</h2></div>
-    <p class="muted">Saved as project instructions in a Claude Project, so every weekly report follows the same rules and format without retyping. The prompt has four parts:</p>
-    <div class="card">
-      <div class="prompt-part">
-        <div><h3>1. Role</h3></div>
-        <div>
+    <div class="sec-label">Prompt design</div>
+    <h2>Four parts, saved as project instructions</h2>
+    <p class="intro">The instructions live in a Claude Project, so every report follows the same rules without retyping them. Each part has one job.</p>
+    <div class="panel">
+      <div class="prompt-row">
+        <div><h3>Role and input</h3><div class="purpose">Defines the task and the only source of information.</div></div>
 <pre>You write weekly project status reports for a project manager.
 I will paste a facts.json file produced by a script that checks a Jira export.</pre>
-          <div class="why">Tells Claude its job and where the input comes from.</div>
-        </div>
       </div>
-      <div class="prompt-part">
-        <div><h3>2. Grounding rules</h3></div>
-        <div>
+      <div class="prompt-row">
+        <div><h3>Grounding rules</h3><div class="purpose">Every statement must trace back to the facts file.</div></div>
 <pre>- Use ONLY the facts in the JSON. Do not add issues, numbers, names or causes that are not in it.
 - Every risk you mention must include its issue key, e.g. ONB-118.
 - If something a section needs is not in the facts, write "No data".</pre>
-          <div class="why">Every statement must be traceable to an issue key in facts.json.</div>
-        </div>
       </div>
-      <div class="prompt-part">
-        <div><h3>3. Fixed decisions</h3></div>
-        <div>
+      <div class="prompt-row">
+        <div><h3>Fixed decisions</h3><div class="purpose">Judgement calls are made in the prompt, not by the model.</div></div>
 <pre>- RAG status: Red if there are 8 or more risks, Amber if 3 to 7, Green if 0 to 2. State the rule you applied.
-- Do not guess causes, blockers, or what an issue is waiting for. Describe each risk only with its reason from the JSON.
+- Do not guess causes, blockers, or what an issue is waiting for.
 - Do not name the project, people or teams. None of them are in the facts.
 - Do not calculate percentages or any new numbers. Use only the counts given.
 - Title the report "Status report - &lt;report_date&gt;".</pre>
-          <div class="why">Judgement calls are written into the prompt as rules, so Claude doesn't make them itself.</div>
-        </div>
       </div>
-      <div class="prompt-part">
-        <div><h3>4. Output format</h3></div>
-        <div>
-<pre>Format (under 250 words). Use exactly these five numbered headings, in this order, and always include all five:
+      <div class="prompt-row">
+        <div><h3>Output format</h3><div class="purpose">A fixed structure makes each report quick to review and easy to compare week to week.</div></div>
+<pre>Under 250 words, exactly these five numbered headings:
 1. Summary: 2 sentences.
 2. RAG status: colour + one-line reason.
 3. Progress: done vs open counts.
-4. Top risks: at most 5, grouped by rule, each with issue key and reason. Pick them in this order:
-   Overdue (most days late first), then Unassigned high priority, then Stale (most days first).
-   If there are more than 5 risks, end with one line "Also flagged:" listing the remaining issue keys.
-5. Decisions needed: one line per risk group saying what the PM should decide or who to follow up with
-   (by role, e.g. "the issue owner", never by name).</pre>
-          <div class="why">A fixed structure makes every report quick to check and comparable week to week.</div>
-        </div>
+4. Top risks: at most 5, grouped by rule, each with issue key and reason.
+   Order: Overdue (most days late first), Unassigned high priority, Stale.
+   Remaining issue keys listed on one "Also flagged:" line.
+5. Decisions needed: one line per risk group, follow-ups by role, never by name.</pre>
       </div>
     </div>
   </section>
 
-  <!-- 4. Hallucination -->
-  <section id="hallucination">
-    <div class="sec-head"><span class="sec-num">4</span><h2>How invented facts were tackled</h2></div>
+  <section id="accuracy">
+    <div class="sec-label">Report accuracy</div>
+    <h2>Controlling invented facts</h2>
+    <p class="intro">Three controls work together. The model sees limited input, has fewer decisions to make, and every output is reviewed against the source.</p>
 
-    <div class="grid-3">
-      <div class="card">
-        <h3>1. Limit what the AI sees</h3>
-        <p class="muted">Claude never reads the raw CSV, only facts.json. It contains no names, so any name in a report is an invented fact by definition.</p>
-      </div>
-      <div class="card">
-        <h3>2. Turn judgement into rules</h3>
-        <p class="muted">The RAG colour, which 5 risks come first, and what is forbidden (causes, names, new numbers) are all fixed in the prompt.</p>
-      </div>
-      <div class="card">
-        <h3>3. Check every line</h3>
-        <p class="muted">Each issue key, number and reason is compared with facts.json. Results are logged in <code>pm/report_checks.csv</code>.</p>
+    <div class="controls">
+      <div class="panel"><h3><span class="idx">01</span>Limited input</h3><p class="muted small">Claude receives facts.json, never the raw export. The file contains no people's names, so any name in a report is an invented fact by definition.</p></div>
+      <div class="panel"><h3><span class="idx">02</span>Rules in the prompt</h3><p class="muted small">The RAG threshold, the order of the top five risks and the banned content (causes, names, new numbers) are fixed in the instructions.</p></div>
+      <div class="panel"><h3><span class="idx">03</span>Line-by-line review</h3><p class="muted small">Each issue key, count and reason is compared with facts.json. Results are logged in a review sheet, and the facts behind each report are saved with it.</p></div>
+    </div>
+
+    <div class="table-panel" style="margin-top:16px">
+      <div class="table-title"><h3>Review log: 16 October report</h3><p>Each draft was checked claim by claim. Instructions were tightened after every finding.</p></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Draft</th><th>Claims checked</th><th>Incorrect</th><th>Invented</th><th>Finding and change made</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td class="num">17</td><td class="num">0</td><td class="num">3</td><td>Invented a project name, a reviewer for ONB-118 and possible causes for stale issues; no RAG section. Added rules banning causes, names and new numbers; fixed headings and top-five order.</td></tr>
+            <tr><td>2</td><td class="num">17</td><td class="num">1</td><td class="num">5</td><td>Most rules ignored. The project instructions were not reaching the model. Instructions and facts were then sent together in one message.</td></tr>
+            <tr><td>3</td><td class="num">22</td><td class="num">0</td><td class="num">0</td><td>All rules followed: RAG Red with the rule stated, top five in the set order, remaining keys listed, follow-ups by role only.</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <div class="card" style="margin-top:16px">
-      <h3>What actually happened with report 1 (16 Oct facts)</h3>
-      <div class="attempts" style="margin-top:12px">
-        <div class="attempt">
-          <span class="pill red">Draft 1</span>
-          <div class="big" style="margin-top:8px">3 invented</div>
-          <p class="muted">17 claims, 0 wrong. Invented a project name, said ONB-118 was "waiting on a reviewer", and said stale issues "may be blocked or abandoned". No RAG section; listed 10 risks instead of 5.</p>
-          <p><strong>Fix:</strong> added rules banning causes, names and new numbers; fixed the headings and top-5 order.</p>
-        </div>
-        <div class="attempt">
-          <span class="pill amber">Draft 2</span>
-          <div class="big" style="margin-top:8px">5 invented, 1 wrong</div>
-          <p class="muted">Ignored nearly every rule. The project instructions were not being applied to the chat.</p>
-          <p><strong>Fix:</strong> pasted the instructions and facts.json together in one message.</p>
-        </div>
-        <div class="attempt">
-          <span class="pill green">Final</span>
-          <div class="big" style="margin-top:8px">0 invented, 0 wrong</div>
-          <p class="muted">22 claims checked. Correct title and five headings, RAG Red with the rule stated, top 5 in the set order, the other 5 under "Also flagged", follow-ups by role only.</p>
-        </div>
-      </div>
-      <div class="callout">
-        <strong>Lessons:</strong> every gap in the instructions is a place where AI fills in its own judgement; checking finds the gaps and rules close them. And a prompt only works if it actually reaches the model.
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:16px">
-      <h3>Excerpt from the final checked report</h3>
+    <div class="panel" style="margin-top:16px">
+      <h3>Excerpt from the final report</h3>
 <pre>Status report - 2026-10-16
 
 2. RAG status
@@ -483,98 +374,71 @@ Also flagged: ONB-129, ONB-140, ONB-121, ONB-112, ONB-137</pre>
     </div>
   </section>
 
-  <!-- 5. Industry -->
-  <section id="industry">
-    <div class="sec-head"><span class="sec-num">5</span><h2>How it can be used in industry</h2></div>
-    <div class="grid-2">
-      <div class="card">
-        <h3>Weekly reporting for PMs and PMOs</h3>
-        <p class="muted">Teams that track work in Jira can export a CSV each week, run one command, and get a report with a summary, RAG status, top risks with issue keys and decisions needed, in the same format every time.</p>
-<pre>python mvp.py data/sample_jira.csv 2026-10-16</pre>
-      </div>
-      <div class="card">
-        <h3>Risks surfaced, not buried</h3>
-        <p class="muted">Overdue work, issues nobody has updated in a week, and high-priority items with no owner are pulled out automatically, each with a reason and an issue key the PM can follow up on.</p>
-      </div>
-      <div class="card">
-        <h3>Adjustable to a team's rules</h3>
-        <p class="muted">The stale limit, which priorities count as high, and which statuses count as done (Done, Closed, Resolved) are settings at the top of the script, changed in one place. When the export has Jira's Status Category column, custom workflow statuses are handled automatically.</p>
-      </div>
-      <div class="card">
-        <h3>AI output that can be trusted and audited</h3>
-        <p class="muted">Because rules decide the facts and AI only writes the words, every sentence in a report can be traced back to facts.json, and the facts used for each report are saved alongside it.</p>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:16px">
-      <h3>Current limitations</h3>
-      <ul>
-        <li>Risk accuracy measured on synthetic data; real-data testing so far is one single-issue export</li>
-        <li>3 rules: overdue, stale, unassigned high priority</li>
-        <li>Out of scope for the MVP: web app, Claude API, meeting notes</li>
-        <li>Still to do: reports 2 and 3, a fresh unseen dataset, and before/after timing</li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- 6. Input validation -->
   <section id="validation">
-    <div class="sec-head"><span class="sec-num">6</span><h2>Input validation for real Jira data</h2></div>
-    <p class="muted">The test data was clean. A real Jira export is not, so before any rule runs, the script checks the input. Problems that would make the risks wrong <strong>stop</strong> the run with a plain-English message; smaller problems are listed as <strong>warnings</strong> so the PM knows what to double-check.</p>
+    <div class="sec-label">Input validation</div>
+    <h2>Making it work on real Jira exports</h2>
+    <p class="intro">Real exports differ from test data in file format, column names and workflow statuses. The script checks its input before any rule runs. Problems that would make the risks wrong stop the run with a clear message; smaller problems are reported as warnings.</p>
 
-    <div class="card">
-      <h3>Why it was needed: first test on a real export</h3>
-      <p class="muted">A real single-issue Jira export (.xlsx, custom workflow) was run through the original pipeline:</p>
+    <div class="table-panel">
+      <div class="table-title"><h3>Test on a real export</h3><p>A single-issue Jira export in Excel format, from a team using a custom workflow.</p></div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Problem in the real export</th><th>Before</th><th>After validation</th></tr></thead>
+          <thead><tr><th>Difference from test data</th><th>Original script</th><th>With validation</th></tr></thead>
           <tbody>
-            <tr><td>Excel file, not CSV</td><td><span class="pill red">Crash</span> UnicodeDecodeError</td><td><span class="pill green">Handled</span> .xlsx read directly</td></tr>
-            <tr><td>Column named <code>Due date</code>, not <code>Due Date</code></td><td><span class="pill red">Crash</span> KeyError: 'Due Date'</td><td><span class="pill green">Handled</span> names matched regardless of capitals and spaces</td></tr>
-            <tr><td>Custom status <code>Pending PO Verification</code>, which Jira's Status Category marks as Done</td><td><span class="pill red">Wrong</span> treated as open and flagged Stale (50 days)</td><td><span class="pill green">Handled</span> Status Category used to decide done; 0 risks</td></tr>
-            <tr><td>Script compared any file with the sample answer key</td><td><span class="pill red">Misleading</span> "Caught 0 of 10"</td><td><span class="pill green">Handled</span> accuracy check skipped when the key is for different data</td></tr>
+            <tr><td>Excel file instead of CSV</td><td>Crashed (UnicodeDecodeError)</td><td>Read directly</td></tr>
+            <tr><td>Column named <code>Due date</code>, not <code>Due Date</code></td><td>Crashed (KeyError)</td><td>Matched regardless of capitals and spaces</td></tr>
+            <tr><td>Custom status <code>Pending PO Verification</code>, in Jira's Done category</td><td>Treated as open, falsely flagged Stale</td><td>Counted as finished using Status Category; no false flag</td></tr>
+            <tr><td>Sample answer key applied to unrelated data</td><td>Reported "Caught 0 of 10"</td><td>Accuracy check runs only when the key matches the data</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <div class="card" style="margin-top:16px">
-      <h3>The checks</h3>
+    <div class="table-panel">
+      <div class="table-title"><h3>Checks</h3></div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Check</th><th>Result</th><th>Why it matters</th></tr></thead>
+          <thead><tr><th>Check</th><th>Outcome</th><th>Purpose</th></tr></thead>
           <tbody>
-            <tr><td>File exists</td><td><span class="pill red">Stop</span></td><td>Clear message instead of a Python error</td></tr>
-            <tr><td>File type is .csv or .xlsx</td><td><span class="pill red">Stop</span></td><td>Jira exports both; anything else can't be read safely</td></tr>
-            <tr><td>Report date is a real date (YYYY-MM-DD)</td><td><span class="pill red">Stop</span></td><td>Every rule is measured from the report date</td></tr>
-            <tr><td>File has issue rows</td><td><span class="pill red">Stop</span></td><td>An empty report would look like "no risks"</td></tr>
-            <tr><td>Required columns present: Issue key, Status, Priority, Assignee, Updated, Due Date</td><td><span class="pill red">Stop</span></td><td>A missing column would silently switch off a rule. The message lists what was found</td></tr>
-            <tr><td>Column names matched regardless of capitals and spaces</td><td><span class="pill green">Auto-fix</span></td><td>Different Jira setups name columns slightly differently</td></tr>
-            <tr><td>Rows without an issue key</td><td><span class="pill amber">Warn</span> + skipped</td><td>Every risk must point to a real issue key</td></tr>
-            <tr><td>Duplicate issue keys</td><td><span class="pill amber">Warn</span></td><td>The same issue could be counted twice</td></tr>
-            <tr><td>Dates that can't be read</td><td><span class="pill amber">Warn</span> with example keys</td><td>An unreadable due date would silently hide an overdue issue</td></tr>
-            <tr><td>Issues updated after the report date</td><td><span class="pill amber">Warn</span></td><td>Usually means the wrong report date was typed</td></tr>
-            <tr><td>Done vs open decided by Jira's Status Category when present, otherwise Done / Closed / Resolved</td><td><span class="pill green">Auto-fix</span></td><td>Real workflows use custom statuses such as Dev Complete or Ready for QA</td></tr>
-            <tr><td>Statuses treated as open are printed</td><td><span class="pill info">Shown</span></td><td>The PM can see at a glance if a finished status is being counted as open</td></tr>
-            <tr><td>CSV text encoding (UTF-8, then Windows)</td><td><span class="pill green">Auto-fix</span></td><td>CSVs re-saved in older Excel use a different encoding</td></tr>
+            <tr><td>File exists</td><td><span class="tag stop">Stop</span></td><td>Clear message instead of a Python error</td></tr>
+            <tr><td>File type is .csv or .xlsx</td><td><span class="tag stop">Stop</span></td><td>Jira exports both formats</td></tr>
+            <tr><td>Report date is a valid date</td><td><span class="tag stop">Stop</span></td><td>Every rule is measured from it</td></tr>
+            <tr><td>File contains issue rows</td><td><span class="tag stop">Stop</span></td><td>An empty file would read as "no risks"</td></tr>
+            <tr><td>Required columns present</td><td><span class="tag stop">Stop</span></td><td>A missing column would silently disable a rule; the message lists the columns found</td></tr>
+            <tr><td>Column names matched regardless of capitals and spaces</td><td><span class="tag ok">Auto-fix</span></td><td>Jira setups name columns differently</td></tr>
+            <tr><td>Done or open decided by Status Category when present</td><td><span class="tag ok">Auto-fix</span></td><td>Handles custom workflow statuses</td></tr>
+            <tr><td>CSV encoding (UTF-8, then Windows)</td><td><span class="tag ok">Auto-fix</span></td><td>CSVs re-saved in older Excel use a different encoding</td></tr>
+            <tr><td>Rows without an issue key</td><td><span class="tag warn">Warn</span></td><td>Skipped, because every risk must point to an issue</td></tr>
+            <tr><td>Duplicate issue keys</td><td><span class="tag warn">Warn</span></td><td>The same issue could be counted twice</td></tr>
+            <tr><td>Dates that cannot be read</td><td><span class="tag warn">Warn</span></td><td>An unreadable due date would hide an overdue issue; example keys are listed</td></tr>
+            <tr><td>Updates after the report date</td><td><span class="tag warn">Warn</span></td><td>Usually a mistyped report date</td></tr>
+            <tr><td>Statuses treated as open</td><td><span class="tag plain">Listed</span></td><td>Shows at a glance if a finished status is being counted as open</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <div class="grid-2" style="margin-top:16px">
-      <div class="card">
-        <h3>Tested on 8 inputs</h3>
-        <ul>
-          <li>Sample data, 16 Oct: <strong>still 10 of 10, 0 extra flags</strong>, no warnings</li>
-          <li>Real .xlsx export: read directly, counted as done, 0 risks</li>
-          <li>Real .xlsx without the Excel reader installed: clear install message</li>
-          <li>Messy CSV with renamed columns, a blank key, a duplicate key, an unreadable date and a future update: all 4 warnings raised, custom statuses handled</li>
-          <li>Missing Assignee column, a .txt file, a missing file and the date 2026-13-45: each stopped with a clear message</li>
-        </ul>
+    <div class="cols" style="margin-top:16px">
+      <div class="panel">
+        <h3>Validation test runs</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Input</th><th>Result</th></tr></thead>
+            <tbody>
+              <tr><td>Test sprint, 16 Oct</td><td>10 of 10 risks, no false flags, no warnings</td></tr>
+              <tr><td>Real Excel export</td><td>Read directly, correctly counted as finished</td></tr>
+              <tr><td>Excel without reader installed</td><td>Install instruction shown</td></tr>
+              <tr><td>Messy CSV</td><td>All 4 warnings raised</td></tr>
+              <tr><td>Missing column</td><td>Stopped, columns listed</td></tr>
+              <tr><td>Text file</td><td>Stopped, formats listed</td></tr>
+              <tr><td>Missing file</td><td>Stopped</td></tr>
+              <tr><td>Date 2026-13-45</td><td>Stopped, format shown</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div class="card">
-        <h3>Example output: messy CSV</h3>
+      <div class="panel">
+        <h3>Console output for the messy CSV</h3>
 <pre>Input checks: 5 issues read from messy.csv
   Finished when: Status Category is Done
   Treated as open: Dev Complete, In Progress, Ready for QA
@@ -584,17 +448,49 @@ Also flagged: ONB-129, ONB-140, ONB-121, ONB-112, ONB-137</pre>
            as dates (e.g. ABC-3)
   WARNING: 1 issue(s) updated after the report date
            - is the report date right?</pre>
-        <p class="muted" style="margin-top:10px;font-size:0.88rem">Example stop:</p>
+        <p class="small muted" style="margin:14px 0 8px">Example of a stop:</p>
 <pre>INPUT ERROR: Missing column(s): Assignee. Columns found:
 Issue key, Status, Priority, Updated, Due Date</pre>
       </div>
     </div>
   </section>
 
+  <section id="use">
+    <div class="sec-label">Use in practice</div>
+    <h2>Where it fits in a delivery team</h2>
+    <div class="cols">
+      <div class="panel">
+        <h3>Weekly status reporting</h3>
+        <p class="muted">Export the sprint from Jira, run one command with the report date, and paste facts.json into the Claude Project. The report has the same five sections every week.</p>
+<pre>python mvp.py sprint_export.xlsx 2026-10-16</pre>
+      </div>
+      <div class="panel">
+        <h3>Risk follow-up</h3>
+        <p class="muted">Every overdue, stale or unowned issue is listed with its issue key and a one-line reason, so it can be opened in Jira and assigned an action.</p>
+      </div>
+      <div class="panel">
+        <h3>Different Jira setups</h3>
+        <p class="muted">Accepts CSV or Excel, matches column names flexibly and reads custom workflows through Status Category. The stale limit, high priorities and finished statuses are settings at the top of the script.</p>
+      </div>
+      <div class="panel">
+        <h3>Reviewable AI output</h3>
+        <p class="muted">The facts behind each report are saved with it, and every sentence can be traced to an issue key in that file. A reviewer can verify a report without trusting the model.</p>
+      </div>
+    </div>
+
+    <dl class="facts" style="margin-top:32px">
+      <dt>Scope</dt><dd>Three risk rules. Detection accuracy measured on a synthetic sprint; input handling tested on a real Jira export. Real company data is not stored in the repository.</dd>
+      <dt>Stack</dt><dd>Python, pandas, openpyxl, Claude Projects, GitHub.</dd>
+    </dl>
+  </section>
+
 </main>
 
-<footer class="wrap">
-  Built by Deepak Yadav with help from Claude · <a href="https://github.com/dy671327/ai-status-report">github.com/dy671327/ai-status-report</a>
+<footer>
+  <div class="wrap">
+    <span>Deepak Yadav · AI Status Report Generator</span>
+    <a href="https://github.com/dy671327/ai-status-report">github.com/dy671327/ai-status-report</a>
+  </div>
 </footer>
 
 </body>
