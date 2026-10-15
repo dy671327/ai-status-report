@@ -199,9 +199,9 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
     </div>
 
     <div class="kpis">
-      <div class="kpi"><div class="num">20 of 20</div><div class="label">Planted risks detected across two test sprints</div></div>
-      <div class="kpi"><div class="num">100%</div><div class="label">Precision: no false flags on either sprint</div></div>
+      <div class="kpi"><div class="num">20 of 20</div><div class="label">Planted risks detected across two test sprints, with no false flags</div></div>
       <div class="kpi"><div class="num">3 of 3</div><div class="label">Final reports passed line-by-line review with no invented facts</div></div>
+      <div class="kpi"><div class="num">~71%</div><div class="label">Less time per report: 25 to 7 minutes (estimate, <a href="#time">method</a>)</div></div>
       <div class="kpi"><div class="num">13</div><div class="label">Input checks run before any risk rule</div></div>
     </div>
   </div>
@@ -214,6 +214,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
     <a href="#prompt">Prompt design</a>
     <a href="#accuracy">Report accuracy</a>
     <a href="#validation">Input validation</a>
+    <a href="#time">Time</a>
     <a href="#use">Use in practice</a>
   </div>
 </nav>
@@ -465,6 +466,50 @@ Also flagged: ONB-129, ONB-140, ONB-121, ONB-112, ONB-137</pre>
 Issue key, Status, Priority, Updated, Due Date</pre>
       </div>
     </div>
+  </section>
+
+  <section id="time">
+    <div class="sec-label">Time</div>
+    <h2>Estimated time per report: 25 minutes to 7</h2>
+    <p class="intro">An estimate, built step by step from published reading and writing speeds and this project's real sizes: 23 open issues, reports of about 180 words and about 27 claims to check. The review step is kept in full in both methods, so the saving does not rely on trusting the AI output.</p>
+
+    <div class="cols">
+      <div class="table-panel">
+        <div class="table-title"><h3>Manual</h3></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Step</th><th>Min</th><th>Basis</th></tr></thead>
+            <tbody>
+              <tr><td>Filter and count issues</td><td class="num">2.0</td><td>Assumed</td></tr>
+              <tr><td>Find overdue, work out days late</td><td class="num">3.9</td><td>23 rows × 5 s + 4 × 30 s</td></tr>
+              <tr><td>Find stale, work out days quiet</td><td class="num">3.4</td><td>23 rows × 5 s + 3 × 30 s</td></tr>
+              <tr><td>Find unassigned high priority</td><td class="num">1.0</td><td>Assumed</td></tr>
+              <tr><td>Write the report</td><td class="num">9.6</td><td>182 words at 19 wpm</td></tr>
+              <tr><td>Read it through</td><td class="num">0.8</td><td>182 words at 238 wpm</td></tr>
+              <tr><td>Check every claim</td><td class="num">4.6</td><td>27 claims × 10 s</td></tr>
+              <tr><td><strong>Total</strong></td><td class="num"><strong>25.2</strong></td><td></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="table-panel">
+        <div class="table-title"><h3>With the MVP</h3></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Step</th><th>Min</th><th>Basis</th></tr></thead>
+            <tbody>
+              <tr><td>Run mvp.py</td><td class="num">0.5</td><td>Script measured at under 1 s</td></tr>
+              <tr><td>Generate report with Claude</td><td class="num">1.0</td><td>Assumed</td></tr>
+              <tr><td>Read it through</td><td class="num">0.8</td><td>182 words at 238 wpm</td></tr>
+              <tr><td>Check every claim</td><td class="num">4.6</td><td>27 claims × 10 s</td></tr>
+              <tr><td>Save the report</td><td class="num">0.5</td><td>Assumed</td></tr>
+              <tr><td><strong>Total</strong></td><td class="num"><strong>7.3</strong></td><td></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <p class="small muted" style="margin-top:12px">Writing speed: 19 words per minute for average users composing at a keyboard (<a href="https://en.wikipedia.org/wiki/Words_per_minute">Karat et al., 1999</a>). Reading speed: 238 words per minute for adult silent reading of non-fiction (<a href="https://www.Gwern.net/doc/psychology/linguistics/2019-brysbaert.pdf">Brysbaert, 2019</a>). Full method in <a href="https://github.com/dy671327/ai-status-report/blob/main/pm/time_estimate.md">pm/time_estimate.md</a>.</p>
   </section>
 
   <section id="use">
